@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yachoo_Dice</title>
+</head>
+<body>
+    <style>
+        tr{
+            border-color : black;
+        }
+    </style>
+    <script>
+        var Area_number1 = 0;
+        var Area_number2 = 0;
+        var Area_number3 = 0;
+        var Area_number4 = 0;
+        var Area_number5 = 0;
+        var Area_number6 = 0;
+        var start_roll = true;
+        var num_arr = [0,0,0,0,0];
+        var count_roll = 3;
+        var count_turn = 15;
+        var Area_player_number=0;
+        var Area_player_name = new Array();
+        var user_Arr = new Array();
+        var count_rest_player=0;
+        var now_player = 1;
+        var real_now_player = 0;
+        var for_count_turn = 4;
+        var Area_str = "";
+        var sum_1=0;
+        var sum_2=0;
+        var sum_3=0;
+        var sum_4=0;
+        var sum_5=0;
+        var sum_6=0;
+        var sum_total=0;
+                            //  1    2    3     4    5    6   sum   o_p   t_p   t_k   f_k   f_h   s_s   l_s  yachoo
+        var check_state_arr = [true,true,true,true,true,true,false,false,false,false,false,false,false,false,false];
+        class User{
+            btn_1 = false;
+            btn_2 = false;
+            btn_3 = false;
+            btn_4 = false;
+            btn_5 = false;
+            btn_6 = false;
+            btn_Total = false;
+            btn_One_Pair = false;
+            btn_Two_Pair = false;
+            btn_Three_of_Kind = false;
+            btn_Four_of_Kind = false;
+            btn_Full_House = false;
+            btn_Small_Straight = false;
+            btn_Large_Straight = false;
+            btn_YACHOO = false;
+            user_Name = "";
+            select_point = false;
+            total_Score = 0;
+            constructor(user_Name){
+                this.user_Name = user_Name;
+            }
+        }
+
+        //select how many player?
+        function select_player(){
+            var Num_player = document.getElementById("player_number").value;
+            var str = "";
+            Area_player_number = Num_player;
+            count_rest_player = Num_player;
+            console.log(Num_player);
+            str += "<div id = \"box1\">";
+            for(var i=0; i<Num_player; i++)
+            {
+                str += "유저이름 입력";
+                str += "<input type = \"text\" id = \"user_Name "+i+"\" value = \"\">";
+                str += "<br>";
+                str += "</div>";
+            }
+            str += "<input type = \"button\" id = \"gameStart\" value=\"게임시작\" onclick = \"func_game_start()\" >";
+            document.getElementById("start_box").innerHTML = str;
+        }
+
+        //if game start, save user name and display gamepage
+        function func_game_start(){
+            var user_name_Arr = new Array();
+            for(var i=0; i<Area_player_number; i++)
+            {
+                Area_player_name[i] = document.getElementById("user_Name"+" "+i).value;
+                console.log(Area_player_name[i]);
+            }
+            for(var i=0; i<=Area_player_number; i++)
+            {
+                user_Arr[i] = new User(Area_player_name[i]);
+                console.log(user_Arr[i].total_Score+" "+user_Arr[i].user_Name+" "+user_Arr[i].btn_1);
+            }
+            document.getElementById("start_box").style.display="none";
+            document.getElementById("main_box").style.display="block";
+            document.getElementById("now-player").value = Area_player_name[0];
+            add_table();
+            document.getElementById("table"+real_now_player).style.borderColor='red';
+        }
+
+        //add_table for players
+        function add_table(){
+            for(var i=0; i<Area_player_number; i++)
+            {
+                Area_str += "<div id = \"table_box" + i + "\" style = \"float:left; width:25%\" disabled>";
+                Area_str += "<input type = \"text\" id = \"user_id" + i + "\" value = \"아이디명\" style = \"border-width:0px; background-color:#ffffff; width:50px; height:20px; text-align:center; margin-left:30px\" disabled>";
+                Area_str += "<input type = \"text\" value = \"/\" style = \"border-width:0px; background-color : #ffffff; width:10px; height:20px; text-align:center\" disabled> ";
+                Area_str += "<input type = \"text\" id = \"total_score"+i+ "\" value = \"0\" style = \"border-width:0px; background-color:#ffffff; width:50px; height:20px; text-align:center\" disabled>";
+                Area_str += "<table id = \"table"+i+"\" border = \"2\" style = \"margin-left:20px;\" disabled>";
+                Area_str += "<tr style = \"border-color:black\">";
+                Area_str += "<td style = \"width:40px; text-align:center\"> 1 </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button1\" value = \"누르기\" onclick = \"button1()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> 2 </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button2\" value = \"누르기\" onclick = \"button2()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> 3 </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button3\" value = \"누르기\" onclick = \"button3()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> 4 </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button4\" value = \"누르기\" onclick = \"button4()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> 5 </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button5\" value = \"누르기\" onclick = \"button5()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> 6 </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button6\" value = \"누르기\" onclick = \"button6()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> Total </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Total\" value = \"누르기\" onclick = \"button_Total()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> One Pair </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_One_Pair\" value = \"누르기\" onclick = \"button_One_Pair()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> Two Pair </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Two_Pair\" value = \"누르기\" onclick = \"button_Two_Pair()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> Three of Kind </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Three_of_Kind\" value = \"누르기\" onclick = \"button_Three_of_Kind()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> Four_of_Kind </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Four_of_Kind\" value = \"누르기\" onclick = \"button_Four_of_Kind()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> Full House </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Full_House\" value = \"누르기\" onclick = \"button_Full_House()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> Small Straight </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Small_Straight\" value = \"누르기\" onclick = \"button_Small_Straight()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> Large Straight </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Large_Straight\" value = \"누르기\" onclick = \"button_Large_Straight()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "<tr>";
+                Area_str += "<td style = \"width:40px; text-align:center\"> YACHOOOOOOO </td>";
+                Area_str += "<td style = \"width:100px; text-align:center\"> <input type = \"button\" id = \"table_box"+i+"_button_Yachoo\" value = \"누르기\" onclick = \"button_YACHOO()\"> </td>";
+                Area_str += "</tr>";
+                Area_str += "</table>";
+                Area_str += "</div>";
+            }
+            document.getElementById("score_table").innerHTML = Area_str;
+            for(var i=0; i<Area_player_number; i++)
+            {
+                document.getElementById("user_id"+i).value = Area_player_name[i];
+                document.getElementById("total_score"+i).value = user_Arr[i].total_Score;
+            }
+        }
+
+        //Roll dice. if my turn state init
+        function roll_dice()
+        {
+            if(count_roll != 0)
+            {
+                sum_1 = 0;
+                sum_2 = 0;
+                sum_3 = 0;
+                sum_4 = 0;
+                sum_5 = 0;
+                sum_6 = 0;
+                sum_total = 0;
+                check_state_arr = [true,true,true,true,true,true,true,false,false,false,false,false,false,false,false];
+                count_roll--;
+                console.log(count_roll);
+                document.getElementById("count_text").value = count_roll;
+                if(start_roll == true)
+                {
+                    for(var i=0; i<5; i++)
+                    {
+                        num_arr[i] = parseInt((Math.random()*6)+1);
+                    }
+                    start_roll = false;
+                }
+                if(count_roll == 0)
+                    document.getElementById("count_text").value = "끝";
+                if(start_roll == false)
+                {
+                    for(var i=0; i<5; i++)
+                    {
+                        if(document.getElementById("check"+i).checked == true)
+                        {
+
+                        }
+                        else if(document.getElementById("check"+i).checked == false)
+                        {
+                            num_arr[i] = parseInt((Math.random()*6)+1);
+                        }
+                    }
+                }
+
+                document.getElementById("text0").value = num_arr[0];
+                document.getElementById("text1").value = num_arr[1];
+                document.getElementById("text2").value = num_arr[2];
+                document.getElementById("text3").value = num_arr[3];
+                document.getElementById("text4").value = num_arr[4];
+                return sort_1();
+            }
+        }
+
+
+        //next turn
+        function turn_change()
+        {
+            //게임이 끝났을 시(모든 턴 종료)
+            if(count_turn==0 && now_player ==1)
+            {
+                alert("게임종료");
+            }
+            //게임 진행중일시
+            else
+            {
+                console.log("count_turn: "+count_turn+" "+"count_rest_player: "+count_rest_player);
+                count_roll = 3;
+                document.getElementById("count_text").value = "3";
+                document.getElementById("sort_text1").value = "0,0,0,0,0";
+                document.getElementById("number_state").value = "돌리시게나";
+                sum_1 = 0;
+                sum_2 = 0;
+                sum_3 = 0;
+                sum_4 = 0;
+                sum_5 = 0;
+                sum_6 = 0;
+                sum_total = 0;
+                num_arr = [0,0,0,0,0];
+                check_state_arr = [true,true,true,true,true,true,true,false,false,false,false,false,false,false,false];
+                for(var i=1; i<7; i++)
+                {
+                    document.getElementById("text_sum"+i).value = 0;
+                }
+                document.getElementById("text_total").value = 0;
+                for(var i=0; i<15; i++)
+                    check_state_arr[i] = false;
+                for(var i=0; i<5; i++)
+                {
+                    document.getElementById("text"+i).value = 0;
+                    document.getElementById("check"+i).checked = false;
+                }                           
+                if(count_rest_player>1)
+                {
+                    //턴 넘기기 눌렀을 떄, 현재차례 증가
+                    count_rest_player--;
+                    now_player++;
+                    console.log("real_now_player: "+real_now_player);
+                    real_now_player++;
+                    document.getElementById("now-player").value = Area_player_name[now_player-1];
+                    table_color_change();
+                }
+                else
+                {
+                    //한 사이클 다 돌았을 경우 남은 턴 -1
+                    count_turn--;
+                    count_rest_player = Area_player_number;
+                    now_player = 1;
+                    real_now_player = 0;
+                    console.log("real-now-player: "+real_now_player);
+                    document.getElementById("now-player").value = Area_player_name[now_player]-1;
+                    table_color_change();
+                    for(var i=0; i<Area_player_number; i++)
+                    {
+                        user_Arr[i].select_point = false;
+                        console.log("user_select_point_state: "+user_Arr[i].select_point);
+                    }
+                }
+                if(count_turn != 1)
+                    document.getElementById("count_turn_text").value = count_turn;
+                else
+                    document.getElementById("count_turn_text").value = "마지막 턴";
+                if(count_turn == 0 && now_player == 1)
+                {
+                    var winner = who_is_win();
+                    alert("게임종료. 승자: "+winner);
+                }
+            }
+        }
+        
+        //dice number sort
+        function sort_1()
+        {
+            var number1 = document.getElementById("text0").value;
+            var number2 = document.getElementById("text1").value;
+            var number3 = document.getElementById("text2").value;
+            var number4 = document.getElementById("text3").value;
+            var number5 = document.getElementById("text4").value;
+            const arr = [number1,number2,number3,number4,number5];
+            arr.sort(function(a,b){
+                return a-b;
+            });
+
+            document.getElementById("sort_text1").value = arr+'';
+            Area_number1 = arr[0];
+            Area_number2 = arr[1];
+            Area_number3 = arr[2];
+            Area_number4 = arr[3];
+            Area_number5 = arr[4];
+            return check_number();
+        }
+
+        //턴이 넘어갈 시 해당 차례 테이블에 빨간색 테두리가 생긴다.
+        //if turn change, border color is red who now turn player
+        function table_color_change()
+        {
+            for(var i=0; i<Area_player_number; i++)
+                document.getElementById("table"+i).style.borderColor = 'black';
+            document.getElementById("table"+real_now_player).style.borderColor = 'red';
+        }
+
+        //dice number state check
+        //주사위가 현재 어떤 상태인지 체크
+        function check_number()
+        {
+            for(var i=0; i<5; i++)
+            {
+                if(num_arr[i]==1)
+                    sum_1 += num_arr[i]
+                if(num_arr[i]==2)
+                    sum_2 += num_arr[i]
+                if(num_arr[i]==3)
+                    sum_3 += num_arr[i]
+                if(num_arr[i]==4)
+                    sum_4 += num_arr[i]
+                if(num_arr[i]==5)
+                    sum_5 += num_arr[i]
+                if(num_arr[i]==6)
+                    sum_6 += num_arr[i]
+                sum_total += num_arr[i];    
+            }
+            document.getElementById("text_sum1").value = sum_1;
+            document.getElementById("text_sum2").value = sum_2;
+            document.getElementById("text_sum3").value = sum_3;
+            document.getElementById("text_sum4").value = sum_4;
+            document.getElementById("text_sum5").value = sum_5;
+            document.getElementById("text_sum6").value = sum_6;
+            document.getElementById("text_total").value = sum_total;
+
+            //YACHOOOOOOOOOOOOO
+            if(Area_number1 == Area_number2 && Area_number2 == Area_number3 && Area_number3 == Area_number4 &&
+            Area_number4 == Area_number5)
+            {
+                if(Area_number1 == 0 && Area_number2 == 0 && Area_number3 == 0 && Area_number4 == 0 && Area_number5 == 0)
+                {
+
+                }
+                else
+                {
+                    check_state_arr[14] = true;
+                    document.getElementById("number_state").value = "YACHOOOOOOOOOOOOO";
+                }
+            }
+
+            //Large Straight
+            else if(Area_number5 - Area_number1 == 4 && Area_number2 - Area_number1 == 1 && Area_number3 - Area_number2 == 1
+                   && Area_number4 - Area_number3 == 1 && Area_number5 - Area_number4 == 1)
+                   {
+                       check_state_arr[13] = true;
+                       document.getElementById("number_state").value = "Large Straight";
+                   }
+
+            //Small Straight
+            else if( (Area_number4 - Area_number1 == 3 || Area_number5 - Area_number2 == 3) && 
+                     ( (Area_number2 - Area_number1 == 1 && Area_number3 - Area_number2 == 1 && Area_number4 - Area_number3 == 1) ||
+                       (Area_number3 - Area_number2 == 1 && Area_number4 - Area_number3 == 1 && Area_number5 - Area_number4 ==1) ))
+                    {
+                        check_state_arr[12] = true;
+                        document.getElementById("number_state").value = "Small Straight";
+                    }
+
+            //Full House
+            else if( ( (Area_number1 == Area_number2) && (Area_number3 == Area_number4 && Area_number4 == Area_number5 && Area_number5 == Area_number6) ) || 
+                       (Area_number1 == Area_number2 && Area_number2 == Area_number3 && Area_number3 == Area_number1) && (Area_number4 == Area_number5) )
+                    {
+                        check_state_arr[11] = true;
+                        document.getElementById("number_state").value = "Full House";
+                    }
+
+            //Four of Kind
+            else if( (Area_number1 == Area_number2 && Area_number2 == Area_number3 && Area_number3 == Area_number4 && Area_number4 == Area_number1) ||
+                     (Area_number2 == Area_number3 && Area_number3 == Area_number4 && Area_number4 == Area_number5 && Area_number5 == Area_number2) )
+                    {
+                        if( (Area_number1 == Area_number2 && Area_number2 == Area_number3 && Area_number3 == Area_number4 && Area_number4 == Area_number5 && Area_number5 == Area_number1) )
+                        {
+                            //yachoo
+                        }
+                        else
+                        {
+                            check_state_arr[10] = true;
+                            document.getElementById("number_state").value = "Four of Kind";
+                        }     
+                    }  
+            
+            //Three of Kind
+            else if( (Area_number1 == Area_number2 && Area_number2 == Area_number3 && Area_number3 == Area_number1) ||
+                     (Area_number2 == Area_number3 && Area_number3 == Area_number4 && Area_number4 == Area_number2) ||
+                     (Area_number3 == Area_number4 && Area_number4 == Area_number5 && Area_number5 == Area_number3) )
+                    {
+                        if( (Area_number1 == Area_number2 && Area_number2 == Area_number3 && Area_number3 == Area_number4) ||
+                             (Area_number2 == Area_number3 && Area_number3 == Area_number4 && Area_number4 == Area_number5) ||
+                             (Area_number1 == Area_number2 && Area_number2 == Area_number3 && Area_number3 == Area_number4 && Area_number4 == Area_number5))
+                        {
+
+                        }
+                        else
+                        {
+                            check_state_arr[9] = true;
+                            document.getElementById("number_state").value = "Three of Kind";
+                        }
+                        
+                    }
+            else if( ((Area_number1 == Area_number2) && (Area_number3 == Area_number4)) || 
+                     ((Area_number2 == Area_number3) && (Area_number4 == Area_number5)) ||
+                     ((Area_number1 == Area_number2) && (Area_number4 == Area_number5)))
+                    {
+                        check_state_arr[8] = true;
+                        document.getElementById("number_state").value = "Two Pair";
+                    }
+            else if( (Area_number1 == Area_number2) || (Area_number2 == Area_number3) || (Area_number3 == Area_number4) || (Area_number4 == Area_number5))
+                   {
+                        if( ((Area_number1 == Area_number3) || (Area_number1 == Area_number4) || (Area_number1 == Area_number5)) && 
+                            ((Area_number2 == Area_number3) || (Area_number2 == Area_number4) || (Area_number2 == Area_number5)) &&
+                            ((Area_number3 == Area_number4) || (Area_number3 == Area_number5)) )
+                        {
+
+                        }
+                        else
+                        {
+                            check_state_arr[7] = true;
+                            document.getElementById("number_state").value = "One_Pair";
+                        }
+                   }
+            else
+            {
+                document.getElementById("number_state").value = "fool";
+            }
+            console.log(check_state_arr);
+        }
+    
+    function button1()
+    {
+        if(check_state_arr[0] == true)
+        {
+            if(user_Arr[real_now_player].btn_1 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button1").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button1").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button1").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button1").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button1").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button1").value = sum_1;
+                document.getElementById("table_box"+real_now_player+"_button1").disabled = true;
+                user_Arr[real_now_player].btn_1 = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += sum_1;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[0] == false)
+        {
+            if(user_Arr[real_now_player].btn_1 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button1").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button1").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button1").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button1").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button1").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button1").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button1").disabled = true;
+                user_Arr[real_now_player].btn_1 = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+        sum_1=0;
+    }
+
+    function button2()
+    {
+        if(check_state_arr[1] == true)
+        {
+            if(user_Arr[real_now_player].btn_2 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button2").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button2").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button2").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button2").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button2").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button2").value = sum_2;
+                document.getElementById("table_box"+real_now_player+"_button2").disabled = true;
+                user_Arr[real_now_player].btn_2 = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += sum_2;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[1] == false)
+        {
+            if(user_Arr[real_now_player].btn_2 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button2").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button2").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button2").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button2").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button2").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button2").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button2").disabled = true;
+                user_Arr[real_now_player].btn_2 = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+        sum_2=0;
+    }
+
+    function button3()
+    {
+        if(check_state_arr[2] == true)
+        {
+            if(user_Arr[real_now_player].btn_3 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button3").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button3").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button3").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button3").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button3").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button3").value = sum_3;
+                document.getElementById("table_box"+real_now_player+"_button3").disabled = true;
+                user_Arr[real_now_player].btn_3 = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += sum_3;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[2] == false)
+        {
+            if(user_Arr[real_now_player].btn_3 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button3").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button3").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button3").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button3").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button3").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button3").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button3").disabled = true;
+                user_Arr[real_now_player].btn_3 = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+        sum_3=0;
+    }
+
+    function button4()
+    {
+        if(check_state_arr[3] == true)
+        {
+            if(user_Arr[real_now_player].btn_4 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button4").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button4").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button4").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button4").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button4").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button4").value = sum_4;
+                document.getElementById("table_box"+real_now_player+"_button4").disabled = true;
+                user_Arr[real_now_player].btn_4 = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += sum_4;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[3] == false)
+        {
+            if(user_Arr[real_now_player].btn_3 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button4").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button4").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button4").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button4").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button4").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button4").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button4").disabled = true;
+                user_Arr[real_now_player].btn_4 = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+        sum_4=0;
+    }
+    function button5()
+    {
+        if(check_state_arr[4] == true)
+        {
+            if(user_Arr[real_now_player].btn_5 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button5").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button5").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button5").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button5").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button5").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button5").value = sum_5;
+                document.getElementById("table_box"+real_now_player+"_button5").disabled = true;
+                user_Arr[real_now_player].btn_5 = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += sum_5;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[4] == false)
+        {
+            if(user_Arr[real_now_player].btn_5 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button5").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button5").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button5").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button5").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button5").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button5").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button5").disabled = true;
+                user_Arr[real_now_player].btn_5 = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+        sum_5=0;
+    }
+    
+    function button6()
+    {
+        if(check_state_arr[5] == true)
+        {
+            if(user_Arr[real_now_player].btn_6 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button6").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button6").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button6").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button6").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button6").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button6").value = sum_6;
+                document.getElementById("table_box"+real_now_player+"_button6").disabled = true;
+                user_Arr[real_now_player].btn_6 = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += sum_6;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[5] == false)
+        {
+            if(user_Arr[real_now_player].btn_6 == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button6").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button6").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button6").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button6").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button6").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button6").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button6").disabled = true;
+                user_Arr[real_now_player].btn_6 = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+        sum_6=0;
+    }
+    function button_Total()
+    {
+        if(check_state_arr[6] == true)
+        {
+            if(user_Arr[real_now_player].btn_Total == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Total").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Total").value = sum_total;
+                document.getElementById("table_box"+real_now_player+"_button_Total").disabled = true;
+                user_Arr[real_now_player].btn_Total = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += sum_total;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[6] == false)
+        {
+            if(user_Arr[real_now_player].btn_Total == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Total").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Total").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Total").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Total").disabled = true;
+                user_Arr[real_now_player].btn_Total = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+        sum_total=0;
+    }
+
+    function button_One_Pair()
+    {
+        if(check_state_arr[7] == true)
+        {
+            if(user_Arr[real_now_player].btn_One_Pair == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").value = 20;
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").disabled = true;
+                user_Arr[real_now_player].btn_One_Pair = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 20;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[7] == false)
+        {
+            if(user_Arr[real_now_player].btn_One_Pair == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_One_Pair").disabled = true;
+                user_Arr[real_now_player].btn_One_Pair = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function button_Two_Pair()
+    {
+        if(check_state_arr[8] == true)
+        {
+            if(user_Arr[real_now_player].btn_Two_Pair == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").value = 25;
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").disabled = true;
+                user_Arr[real_now_player].btn_Two_Pair = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 25;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[8] == false)
+        {
+            if(user_Arr[real_now_player].btn_Two_Pair == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Two_Pair").disabled = true;
+                user_Arr[real_now_player].btn_Two_Pair = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function button_Three_of_Kind()
+    {
+        if(check_state_arr[9] == true)
+        {
+            if(user_Arr[real_now_player].btn_Three_of_Kind == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").value = 30;
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").disabled = true;
+                user_Arr[real_now_player].btn_Three_of_Kind = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 30;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[9] == false)
+        {
+            if(user_Arr[real_now_player].btn_Three_of_Kind == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Three_of_Kind").disabled = true;
+                user_Arr[real_now_player].btn_Three_of_Kind = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function button_Four_of_Kind()
+    {
+        if(check_state_arr[10] == true)
+        {
+            if(user_Arr[real_now_player].btn_Four_of_Kind == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").value = 35;
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").disabled = true;
+                user_Arr[real_now_player].btn_Four_of_Kind = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 35;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[10] == false)
+        {
+            if(user_Arr[real_now_player].btn_Three_of_Kind == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Four_of_Kind").disabled = true;
+                user_Arr[real_now_player].btn_Four_of_Kind = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function button_Full_House()
+    {
+        if(check_state_arr[11] == true)
+        {
+            if(user_Arr[real_now_player].btn_Full_House == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").value = 40;
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").disabled = true;
+                user_Arr[real_now_player].btn_Full_House = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 40;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[11] == false)
+        {
+            if(user_Arr[real_now_player].btn_Full_House == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Full_House").disabled = true;
+                user_Arr[real_now_player].btn_Full_House = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function button_Small_Straight()
+    {
+        if(check_state_arr[12] == true)
+        {
+            if(user_Arr[real_now_player].btn_Small_Straight == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").value = 45;
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").disabled = true;
+                user_Arr[real_now_player].btn_Small_Straight = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 45;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[12] == false)
+        {
+            if(user_Arr[real_now_player].btn_Small_Straight == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Small_Straight").disabled = true;
+                user_Arr[real_now_player].btn_Small_Straight = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function button_Large_Straight()
+    {
+        if(check_state_arr[13] == true)
+        {
+            if(user_Arr[real_now_player].btn_Large_Straight == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").value = 50;
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").disabled = true;
+                user_Arr[real_now_player].btn_Large_Straight = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 50;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[13] == false)
+        {
+            if(user_Arr[real_now_player].btn_Large_Straight == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Large_Straight").disabled = true;
+                user_Arr[real_now_player].btn_Large_Straight = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function button_YACHOO()
+    {
+        if(check_state_arr[14] == true)
+        {
+            if(user_Arr[real_now_player].btn.btn_YACHOO == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").value = 60;
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").disabled = true;
+                user_Arr[real_now_player].btn_YACHOO = true;
+                user_Arr[real_now_player].select_point = true;
+                user_Arr[real_now_player].total_Score += 60;
+                document.getElementById("total_score"+real_now_player).value = user_Arr[real_now_player].total_Score;
+            }
+            else
+            {
+
+            }
+        }
+        else if(check_state_arr[14] == false)
+        {
+            if(user_Arr[real_now_player].btn_YACHOO == false && user_Arr[real_now_player].select_point == false)
+            {
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").type = "text";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.textAlign = "center";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.width = "100px";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.backgroundColor = '#ffffff';
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").style.borderWidth = "0px";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").value = "이걸 못먹네;;";
+                document.getElementById("table_box"+real_now_player+"_button_Yachoo").disabled = true;
+                user_Arr[real_now_player].btn_YACHOO = true;
+                user_Arr[real_now_player].select_point = true;
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    function who_is_win()
+    {
+        var check_win = new Array();
+        var lose_player = new Array();
+        var first_rank_score = 0;
+        var str_win_player = "";
+        for(var z=0; z<user_Arr.length; z++)
+        {
+            check_win.push(user_Arr[z].total_Score);
+        }
+        check_win.sort(function (a,b){
+            return a-b;
+        });
+        first_rank_score = check_win[check_win.length-1];
+        for(var z = 0; z<user_Arr.length; z++)
+        {
+            if(user_Arr[z].total_Score == first_rank_score)
+                str_win_player += user_Arr[z].user_Name + " ";
+        }
+        return str_win_player;
+    }
+    </script>
+    <div>
+        <div id = "main_box" hidden style = "width:30%; float:left">
+            <input type = "button" id = "btn_roll_dice" value = "주사위굴리기" onclick = "roll_dice()">
+            <input type = "text" id = "text0" style = "width:25px; height:20px; text-align:center; background-color: #ffffff; border-width: 1px" disabled>
+            <input type = "text" id = "text1" style = "width:25px; height:20px; text-align:center; background-color: #ffffff; border-width: 1px" disabled>
+            <input type = "text" id = "text2" style = "width:25px; height:20px; text-align:center; background-color: #ffffff; border-width: 1px" disabled>
+            <input type = "text" id = "text3" style = "width:25px; height:20px; text-align:center; background-color: #ffffff; border-width: 1px" disabled>
+            <input type = "text" id = "text4" style = "width:25px; height:20px; text-align:center; background-color: #ffffff; border-width: 1px" disabled>
+            <input type = "button" id = "sort_text1" value = "sort" onclick="sort_1()" style = "background-color: #ffffff; border-width:0px">
+            <input type = "text" id = "number_state" value = "돌리시게나">
+            <br>
+            주사위 잠금<input type="checkbox" id = "check0" style = "position: relative; left: 16px">
+            <input type="checkbox" id = "check1" style="position:relative; left: 21px">
+            <input type="checkbox" id = "check2" style="position:relative; left: 21px">
+            <input type="checkbox" id = "check3" style="position:relative; left: 21px">
+            <input type="checkbox" id = "check4" style="position:relative; left: 21px">
+            <br>
+            <input type="button" value="턴넘기기" id = "turn_change" onclick="turn_change()" style="margin-top: 8px">
+            <br>
+            <input type="text" value = "현재차례: " style="background-color: #ffffff; border-width:0px; width:100px; height:25px; font-size:20px; margin-top:5px" disabled>
+            <input type="text" value="" id = "now-player" style="background-color: #ffffff; border-width: 0px; width:100px; font-size: 20px; margin-top:5px" disabled> 
+            <br>
+            count: <input type="text" id = "count_text" value="3" style="border-width:0px; background-color:#ffffff" disabled>
+            <br>
+            남은 턴: <input type="text" id = "count_turn_text" value = "15" style="border-color: 0px; background-color: #ffffff" disabled>
+            <br>
+            <br>
+            1 숫자 합 <input type="text" id = "text_sum1" value="0" style="text-align: center; width:100px; background-color:#ffffff" disabled>
+            <br>
+            2 숫자 합 <input type="text" id = "text_sum2" value="0" style="text-align: center; width:100px; background-color:#ffffff" disabled>
+            <br>
+            3 숫자 합 <input type="text" id = "text_sum3" value="0" style="text-align: center; width:100px; background-color:#ffffff" disabled>
+            <br>
+            4 숫자 합 <input type="text" id = "text_sum4" value="0" style="text-align: center; width:100px; background-color:#ffffff" disabled>
+            <br>
+            5 숫자 합 <input type="text" id = "text_sum5" value="0" style="text-align: center; width:100px; background-color:#ffffff" disabled>
+            <br>
+            6 숫자 합 <input type="text" id = "text_sum6" value="0" style="text-align: center; width:100px; background-color:#ffffff" disabled>
+            <br>
+            모든 숫자 합 <input type="text" id = "text_total" value = "0" style = "text-align: center; width: 100px; background-color: #ffffff;" disabled>
+        
+            <hr>
+            야추 다이스 룰
+            <br>
+            주사위는 총 3번까지 던질 수 있음. 체크박스 체크 시 그 숫자는 고정이 된다.
+            <br>
+            야추: 같은 숫자의 주사위가 5개 ex)6,6,6,6,6
+            <br>
+            Large Straight: 주사위 숫자가 연속해서 5개일 때 ex)1,2,3,4,5   2,3,4,5,6
+            <br>
+            Small Straight: 주사위 숫자가 연속해서 4개일 때 ex)1,2,3,4,6   2,2,3,4,5
+            <br>
+            Three of Kind: 같은 숫자 주사위가 3개일 때 ex)1,1,1,3,4
+            <br>
+            Four of Kind: 같은 숫자의 주사위가 4개일 때 ex)1,1,1,1,5
+            <br>
+            Full House: 같은 숫자의 주사위가 2개 3개일 때 ex)2,2,3,3,3
+            <br>
+            One Pair: 숫자 1쌍이 같은 것 ex)1,1
+            <br>
+            Two Pair: 숫자 2쌍이 같은 것 ex)1,1,2,2
+            <br>
+            주의: 무조건 점수가 높은 쪽의 주사위 상태를 표시합니다.
+            <br>
+            ex) 3,3,4,4,4, => One Pair , Two Pair, Full House 3가지 경우가 있으나
+            <br>
+            점수로 인정되는 상태는 Full_House이다.
+            <br>
+            나머지 One Pair, Two Pair는 0점이다
+        </div>
+        <div id = "score_table" style="width: 70%; float:left">
+        </div>
+    </div>
+    <div id = "start_box">
+        몇명이서 하시겠습니까?? <input type="number" id = "player_number"><input type="button" id = "select_player" value="클릭" onclick="select_player()">
+    </div>
+</body>
+</html>
